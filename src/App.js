@@ -7,6 +7,7 @@ import LeafPage from './components/LeafSide/LeafPage';
 import SettingsPage from './components/SettingsSide/SettingsPage';  
 import ProfilePage from './components/ProfilePage';
 import AddUserPage from './components/UserSide/AddUserPage';
+import NewPasswordPage from './components/SettingsSide/NewPasswordPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/adduser" element={<AddUserPage />} />
           <Route path="/leaf" element={<LeafPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/newpassword" element={<NewPasswordPage />} />
         </Routes>
       </div>
     </Router>

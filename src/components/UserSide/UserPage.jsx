@@ -14,45 +14,57 @@
     // Function to refresh user list by fetching data again
     const refreshUserList = async () => {
       try {
-        // Fetch all Users
-        const userResponse = await databases.listDocuments('67270ce0001ca47b2525', '67276b5a0021e50d2930');
+        // Fetch all Users (Database, User)
+        const userResponse = await databases.listDocuments('673b418100295c788a93', '673b41c1003840fb1cd8');
         console.log("Users:", userResponse.documents);
   
-        // Fetch all User_Role entries
-        const userRoleResponse = await databases.listDocuments('67270ce0001ca47b2525', '6728e5590018eaed4690');
+        // Fetch all User_Role entries (Database, User_Role)
+        const userRoleResponse = await databases.listDocuments('673b418100295c788a93', '673b41cc002db95aabfc');
         console.log("User Roles:", userRoleResponse.documents);
   
-        // Fetch all Roles
-        const roleResponse = await databases.listDocuments('67270ce0001ca47b2525', '6728ea4e0038fc7f1530');
+        // Fetch all Roles (Database, Role)
+        const roleResponse = await databases.listDocuments('673b418100295c788a93', '673b41d00018b34a286f');
         console.log("Roles:", roleResponse.documents);
   
         // Map role IDs to their rolenames
         const roleMap = roleResponse.documents.reduce((acc, role) => {
-          acc[role.$id] = role.rolename;
+          acc[role.$id] = role.rolename; // Map role ID to role name
           return acc;
         }, {});
+
         console.log("Role Map:", roleMap);
-  
-        // Build User data with Role
+
+        // Format Users with Role Data
         const formattedUsers = userResponse.documents.map(user => {
-          // Find matching User_Role entry for the user by Document/User ID (Array Form, not string)
-          const userRole = userRoleResponse.documents.find(ur => ur.user[0].$id === user.$id);
-          console.log("User Role:", userRole);
-          
-          // Check if userRole is found and retrieve rolename from roleMap (Array Form, not string)
-          const roleName = userRole && userRole.role[0] ? userRole.role[0].rolename : 'No Role Assigned';
-          console.log("Role Name:", roleName);
-  
-          // The admin needs to set the accounts for users
-          return {
-            name: `${user.firstname} ${user.lastname}`,
-            userRole: roleName,
-            date: new Date(user.$createdAt).toLocaleDateString(), // Needs to be accurate
-            time: new Date(user.$createdAt).toLocaleTimeString(), // Needs to be accurate
-            status: user.status || 'offline', // Still needs fixing
-            $id: user.$id // Make sure to pass the user ID to be used in the dropdown toggle
-          };
+        // Find matching User_Role entry for the user by Document/User ID
+        const userRole = userRoleResponse.documents.find(ur => {
+          if (ur.user && Array.isArray(ur.user)) {
+            return ur.user[0].$id === user.$id;
+          }
         });
+
+        console.log("userRoleResponse: ",userRoleResponse.documents);
+
+
+        console.log("User ID in User Role:", userRole);
+
+        // If userRole is found, extract the role ID and use it to get the role name
+        const roleName = userRole && userRole.role 
+          ? roleMap[userRole.role.$id] || 'No Role Assigned'
+          : 'No Role Assigned';
+
+        console.log("Role Name:", roleName);
+
+        // Build the user data with the role
+        return {
+          name: `${user.firstname} ${user.lastname}`,
+          userRole: roleName,
+          date: new Date(user.$createdAt).toLocaleDateString(),
+          time: new Date(user.$createdAt).toLocaleTimeString(),
+          status: user.status || 'offline',
+          $id: user.$id // Pass user ID to be used in dropdown or other logic
+        };
+      });
   
         setUsers(formattedUsers);
       } catch (error) {

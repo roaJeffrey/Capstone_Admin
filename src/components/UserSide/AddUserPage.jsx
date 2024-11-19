@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { databases, account } from '../../appwrite/AppwriteConfig'; // Import appwrite config
+import { databases, account } from '../../appwrite/AppwriteConfig';  // Ensure you're using the correct imports
 import { v4 as uuidv4 } from 'uuid';
 
-function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
+function AddUserPage({ setIsAddUserOpen }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState("");
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -14,125 +16,146 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
     password: "",
     year: "",
     month: "",
-    day: ""
+    day: "",
   });
 
-  const { register, formState: { errors } } = useForm();
+  const { register, formState: { errors }, handleSubmit } = useForm();
 
-  // Toggle password visibility
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const roleResponse = await databases.listDocuments(
+          "673b418100295c788a93", // Database ID
+          "673b41d00018b34a286f"  // Role Collection ID
+        );
+        console.log("Fetched roles:", roleResponse.documents); // For debugging
+        setRoles(roleResponse.documents);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+    fetchRoles();
+  }, []);
+
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  // Handle user signup
-  const signupUser = async (e) => {
-    e.preventDefault();
-
-    // Validate password length
+  const signupUser = async () => {
     if (user.password.length < 8) {
       console.error("Password must be at least 8 characters long.");
       return;
     }
-
+  
     const name = `${user.firstName} ${user.lastName}`;
-
-    // Create birthDate
     const birthDate = new Date(`${user.year}-${user.month}-${user.day}`).toISOString();
-
-    const promise = account.create(
-      uuidv4(),
+  
+    try {
+    // After creating the user account via Appwrite Auth:
+    const newUser = await account.create(
+      uuidv4(),  // Unique user ID for Auth
       user.email,
       user.password,
       name
     );
-    
-    promise.then(
-      function(response) {
-        console.log("User account created:", response);
+    console.log("User account created:", newUser.$id);
 
-        // Save additional User info in the User collection
-        return databases.createDocument(
-          '67270ce0001ca47b2525', // Database ID
-          '67276b5a0021e50d2930', // Collection ID for User
-          uuidv4(),
-          {
-            firstname: user.firstName,
-            lastname: user.lastName,
-            email: user.email,
-            password: user.password,
-            birthdate: birthDate,
-            phonenumber: user.phoneNumber
-          }
-        );
-      }
-    ).then(
-      function(userDocResponse) {
-        console.log("Additional user info saved successfully:", userDocResponse);
-        setIsAddUserOpen(false); // Close modal after successful user creation
+    // Step 2: Save additional user info in the User collection
+    const userData = {
+      firstname: user.firstName,
+      lastname: user.lastName,
+      email: user.email,
+      password: user.password,
+      birthdate: birthDate,
+      phonenumber: user.phoneNumber,
+      // No need to manually add userId because the document will automatically have a unique ID
+    };
 
-        // Refresh user list in parent component after adding the new user
-        refreshUserList();
-      }
-    ).catch(function(error) {
+    const userDocument = await databases.createDocument(
+      "673b418100295c788a93", // Database ID
+      "673b41c1003840fb1cd8", // User Collection ID
+      newUser.$id,            // Use the Auth user ID as the Document ID
+      userData                // Additional user data
+    );
+    console.log("User document created:", userDocument);
+
+    // Step 3: Assign role to the user
+    if (selectedRole) {
+      await databases.createDocument(
+        "673b418100295c788a93", // Database ID
+        "673b41cc002db95aabfc", // User_Role Collection ID
+        uuidv4(),
+        {
+          role: selectedRole, // Role assigned to the user
+          user: [newUser.$id], // Pass the userId from Auth
+          createdby: "673c684700246af87d9d", // Adjust as necessary (Admin User ID)
+        }
+      );
+      console.log("User role assigned successfully.");
+    }
+  
+      setIsAddUserOpen(false); // Close modal on success
+    } catch (error) {
       console.error("Error during signup process:", error);
-    });
+    }
   };
 
-  const handleCancel = () => {
-    setIsAddUserOpen(false); // Close modal when cancel button is clicked
-  };
+  const handleCancel = () => setIsAddUserOpen(false);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-bold mb-4">Add New User</h2>
-        
-        <form className="space-y-4" onSubmit={signupUser}>
-
+        <form className="space-y-4" onSubmit={handleSubmit(signupUser)}>
           {/* Full Name */}
           <div className="flex space-x-2">
             <input
-              {...register("firstname", { required: true })}
+              {...register("firstname", { required: "First name is required." })}
               placeholder="First Name"
               className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
               onChange={(e) => setUser({ ...user, firstName: e.target.value })}
             />
             <input
-              {...register("lastname", { required: true })}
+              {...register("lastname", { required: "Last name is required." })}
               placeholder="Last Name"
               className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
               onChange={(e) => setUser({ ...user, lastName: e.target.value })}
             />
           </div>
+          {errors.firstname && <p className="text-red-500 text-sm">{errors.firstname.message}</p>}
+          {errors.lastname && <p className="text-red-500 text-sm">{errors.lastname.message}</p>}
 
           {/* Birthdate */}
           <div className="flex flex-col mb-4">
             <p className="text-left ml-2 mb-1 text-sm">Birthdate</p>
             <div className="flex space-x-2">
               <select
-                {...register("month", { required: true })}
+                {...register("month", { required: "Month is required." })}
                 className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                value={user.month}
                 onChange={(e) => setUser({ ...user, month: e.target.value })}
               >
-                <option value="" disabled selected>Month</option>
+                <option value="" disabled>Month</option>
                 {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, index) => (
                   <option key={index} value={index + 1}>{month}</option>
                 ))}
               </select>
               <select
-                {...register("day", { required: true })}
+                {...register("day", { required: "Day is required." })}
                 className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                value={user.day}
                 onChange={(e) => setUser({ ...user, day: e.target.value })}
               >
-                <option value="" disabled selected>Day</option>
+                <option value="" disabled>Day</option>
                 {Array.from({ length: 31 }, (_, i) => (
                   <option key={i} value={i + 1}>{i + 1}</option>
                 ))}
               </select>
               <select
-                {...register("year", { required: true })}
+                {...register("year", { required: "Year is required." })}
                 className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                value={user.year}
                 onChange={(e) => setUser({ ...user, year: e.target.value })}
               >
-                <option value="" disabled selected>Year</option>
+                <option value="" disabled>Year</option>
                 {Array.from({ length: 50 }, (_, i) => (
                   <option key={i} value={new Date().getFullYear() - i}>{new Date().getFullYear() - i}</option>
                 ))}
@@ -140,9 +163,10 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
             </div>
           </div>
 
+
           {/* Phone Number */}
           <input
-            {...register("phonenumber", { required: true })}
+            {...register("phonenumber", { required: "Phone number is required." })}
             placeholder="Phone Number"
             type="tel"
             className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
@@ -151,7 +175,7 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
 
           {/* Email */}
           <input  
-            {...register("email", { required: true })}
+            {...register("email", { required: "Email is required." })}
             placeholder="Email"
             type="email"
             className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
@@ -161,7 +185,7 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
           {/* Password */}
           <div className="relative mb-4">
             <input
-              {...register("password", { required: true })}
+              {...register("password", { required: "Password is required." })}
               placeholder="Password"
               type={showPassword ? "text" : "password"}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
@@ -169,13 +193,32 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
             />
             <span 
               onClick={togglePasswordVisibility} 
-              style={{ cursor: 'pointer', position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)' }}
+              className="absolute right-3 top-3 cursor-pointer text-gray-600"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
 
-          {/* Submit Button */}
+          {/* Role Dropdown */}
+          <div className="mb-4">
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+            <select
+              {...register("role", { required: "Role is required." })}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+            >
+              <option value="" disabled>Select Role</option>
+              {roles.map((role) => (
+                <option key={role.$id} value={role.$id}>
+                  {role.rolename}
+                </option>
+              ))}
+            </select>
+            {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
+          </div>
+
+          {/* Submit and Cancel Buttons */}
           <div className="flex justify-end">
             <button
               type="button"
@@ -186,9 +229,9 @@ function AddUserPage({ setIsAddUserOpen, refreshUserList }) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
             >
-              Add User
+              Save
             </button>
           </div>
         </form>

@@ -16,28 +16,43 @@ const Home = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch all Users
-        const userResponse = await databases.listDocuments('67270ce0001ca47b2525', '67276b5a0021e50d2930');
+        // Fetch all Users (Database, User)
+        const userResponse = await databases.listDocuments('673b418100295c788a93', '673b41c1003840fb1cd8');
 
-        // Fetch all User_Role entries
-        const userRoleResponse = await databases.listDocuments('67270ce0001ca47b2525', '6728e5590018eaed4690');
+        // Fetch all User_Role entries (Database, User_Role)
+        const userRoleResponse = await databases.listDocuments('673b418100295c788a93', '673b41cc002db95aabfc');
 
-        // Fetch all Roles
-        const roleResponse = await databases.listDocuments('67270ce0001ca47b2525', '6728ea4e0038fc7f1530');
+        // Fetch all Roles (Database, Role)
+        const roleResponse = await databases.listDocuments('673b418100295c788a93', '673b41d00018b34a286f');
 
         // Map role IDs to their rolenames
         const roleMap = roleResponse.documents.reduce((acc, role) => {
-          acc[role.$id] = role.rolename;
+          acc[role.$id] = role.rolename; // Map role ID to role name
           return acc;
         }, {});
 
-        // Build User data with Role
+        console.log("Role Map:", roleMap);
+
+        // Format Users with Role Data
         const formattedUsers = userResponse.documents.map(user => {
-          // Find matching User_Role entry for the user by Document/User ID (Array Form, not string)
-          const userRole = userRoleResponse.documents.find(ur => ur.user[0].$id === user.$id);
-          
-          // Check if userRole is found and retrieve rolename from roleMap (Array Form, not string)
-          const roleName = userRole && userRole.role[0] ? userRole.role[0].rolename : 'No Role Assigned';
+        // Find matching User_Role entry for the user by Document/User ID
+        const userRole = userRoleResponse.documents.find(ur => {
+          if (ur.user && Array.isArray(ur.user)) {
+            return ur.user[0].$id === user.$id;
+          }
+        });
+
+        console.log("userRoleResponse: ",userRoleResponse.documents);
+
+
+        console.log("User ID in User Role:", userRole);
+
+        // If userRole is found, extract the role ID and use it to get the role name
+        const roleName = userRole && userRole.role 
+          ? roleMap[userRole.role.$id] || 'No Role Assigned'
+          : 'No Role Assigned';
+
+        console.log("Role Name:", roleName);
 
           // The admin need to set the accounts for users
           return {
@@ -58,7 +73,7 @@ const Home = () => {
     const fetchDiseaseCounts = async () => {
       try {
         // Fetch data from Scan_Image collection
-        const diseaseResponse = await databases.listDocuments('67270ce0001ca47b2525', '67270fbf000528e1f755');
+        const diseaseResponse = await databases.listDocuments('673b418100295c788a93', '67270fbf000528e1f755');
         console.log("Scan Images:", diseaseResponse.documents);
     
         // Initialize counts for the specific diseases

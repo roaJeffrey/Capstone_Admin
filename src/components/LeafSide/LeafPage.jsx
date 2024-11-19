@@ -8,9 +8,9 @@ function LeafPage() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef(null);
 
-  const databaseId = "67270ce0001ca47b2525"; // Replace with your Database ID
-  const scanImageCollectionId = "67270fbf000528e1f755"; // Replace with your Scan Images Collection ID
-  const userCollectionId = "67276b5a0021e50d2930"; // Replace with your User Collection ID
+  const databaseId = "673b418100295c788a93"; // Database ID
+  const scanImageCollectionId = "673b41e20028c51fd641"; // Scan_Images ID
+  const userCollectionId = "673b41c1003840fb1cd8"; // User ID
 
   useEffect(() => {
     const fetchScanImages = async () => {
@@ -71,30 +71,33 @@ function LeafPage() {
           <h2 className="text-2xl font-bold">CoffeeByte</h2>
           <nav className="mt-14">
             <ul className="space-y-5">
-              <li>
-                <Link to="/home" className="block p-2 pb-5 bg-custom-green text-white border-b-[1px] border-white">
-                  Overview
-                </Link>
-              </li>
-              <li>
-                <Link to="/user" className="block p-2 pb-5 bg-custom-green text-white border-b-[1px] border-white">
-                  User Management
-                </Link>
-              </li>
-              <li>
-                <Link to="/leaf" className="block p-2 pb-5 bg-custom-green text-white border-b-[1px] border-white">
-                  Leaf Disease
-                </Link>
-              </li>
-              <li>
-                <Link to="/settings" className="block p-2 pb-5 bg-custom-green text-white">
-                  Settings
-                </Link>
-              </li>
+            <li>
+              <Link to="/home" className="block p-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
+              Overview
+              </Link>
+            </li>
+            <li>
+              <Link to="/user" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
+                User Management
+              </Link>
+            </li>
+            <li>
+              <Link to="/leaf" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
+                Leaf Disease
+              </Link>
+            </li>
+            <li>
+              <Link to="/settings" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white">
+                Settings
+              </Link>
+            </li>
             </ul>
           </nav>
         </div>
-        <button onClick={logoutUser} className="py-2 border border-white rounded text-white">
+        <button 
+          onClick={logoutUser} 
+          className="mt-auto py-2 border border-white rounded text-white"
+        >
           Log Out
         </button>
       </aside>
@@ -147,34 +150,34 @@ function LeafPage() {
           </div>
 
           {/* Table */}
-          <table className="table-auto w-full border-collapse border border-gray-300">
+          <table className="table-auto w-full">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2 text-left">Image</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Disease Name</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Severity</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Label</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">User</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Date Scanned</th>
+              <tr className="text-gray-500 border-b border-gray-300 text-left">
+                <th className="pt-5 pb-5">Image</th>
+                <th>Disease Name</th>
+                <th>Severity</th>
+                <th>Label</th>
+                <th className="pl-5">User</th>
+                <th>Date Scanned</th>
               </tr>
             </thead>
             <tbody>
               {scanImages.map((image) => (
                 <tr key={image.$id}>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border-b border-gray-300">
                     <img
                       src={image.imageUrl}
                       alt={image.diseasename || "No Image"}
                       className="w-20 h-20 object-contain rounded"
                     />
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">{image.diseasename || "N/A"}</td>
-                  <td className="border border-gray-300 px-4 py-2">{image.severity || "N/A"}</td>
-                  <td className="border border-gray-300 px-4 py-2">{image.label || "N/A"}</td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border-b border-gray-300">{image.diseasename || "N/A"}</td>
+                  <td className="border-b border-gray-300">{image.severity || "N/A"}</td>
+                  <td className="border-b border-gray-300">{image.label || "N/A"}</td>
+                  <td className="border-b border-gray-300 pl-5">
                     {image.user.firstname} {image.user.lastname}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border-b border-gray-300">
                     {new Date(image.$createdAt).toLocaleString()}
                   </td>
                 </tr>
