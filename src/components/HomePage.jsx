@@ -19,6 +19,9 @@ const Home = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Admin role ID (the role we want to hide)
+  const adminRoleId = '673ee7be0020a2298fd1';
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -66,7 +69,8 @@ const Home = () => {
             userRole: roleName,
             date: new Date(user.$createdAt).toLocaleDateString(), // Needs to be accurate
             time: new Date(user.$createdAt).toLocaleTimeString(), // Needs to be accurate
-            status: user.status || 'offline' // Still needs fixing
+            status: user.status || 'offline', // Still needs fixing
+            roleId: userRole?.role?.$id
           };
         });
 
@@ -79,7 +83,7 @@ const Home = () => {
     const fetchDiseaseCounts = async () => {
       try {
         // Fetch data from Scan_Image collection
-        const diseaseResponse = await databases.listDocuments('673b418100295c788a93', '67270fbf000528e1f755');
+        const diseaseResponse = await databases.listDocuments('673b418100295c788a93', '673b41e20028c51fd641');
         console.log("Scan Images:", diseaseResponse.documents);
     
         // Initialize counts for the specific diseases
@@ -277,8 +281,8 @@ const Home = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
-                <tr key={index} className="border-b">
+              {users.filter(user => user.roleId !== adminRoleId).map(user => (
+                <tr key={`${user.$id}-${user.name}`} className="border-b">
                   <td className="py-2">{user.name}</td>
                   <td>{user.userRole}</td>
                   <td>{user.date}</td>

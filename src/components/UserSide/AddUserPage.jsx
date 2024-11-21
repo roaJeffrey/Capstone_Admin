@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { databases, account } from '../../appwrite/AppwriteConfig';  // Ensure you're using the correct imports
+import { databases, account } from '../../appwrite/AppwriteConfig';
 import { v4 as uuidv4 } from 'uuid';
 
 function AddUserPage({ setIsAddUserOpen }) {
@@ -63,10 +63,9 @@ function AddUserPage({ setIsAddUserOpen }) {
       firstname: user.firstName,
       lastname: user.lastName,
       email: user.email,
-      password: user.password,
       birthdate: birthDate,
       phonenumber: user.phoneNumber,
-      // No need to manually add userId because the document will automatically have a unique ID
+      auth_user_id: newUser.$id
     };
 
     const userDocument = await databases.createDocument(
@@ -99,6 +98,11 @@ function AddUserPage({ setIsAddUserOpen }) {
   };
 
   const handleCancel = () => setIsAddUserOpen(false);
+
+  const filteredRoles = roles.filter(role => role.$id !== '673ee7be0020a2298fd1');
+
+   // Phone number validation regex
+   const phoneRegex = /^(?:\+63|0)\s?9\d{2}\s?\d{3}\s?\d{4}$/;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -166,7 +170,12 @@ function AddUserPage({ setIsAddUserOpen }) {
 
           {/* Phone Number */}
           <input
-            {...register("phonenumber", { required: "Phone number is required." })}
+            {...register("phonenumber", { required: "Phone number is required.", 
+              pattern: {
+                value: phoneRegex,
+                message: "Please enter a valid phone number.",
+              }
+             })}
             placeholder="Phone Number"
             type="tel"
             className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
@@ -209,9 +218,9 @@ function AddUserPage({ setIsAddUserOpen }) {
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <option value="" disabled>Select Role</option>
-              {roles.map((role) => (
-                <option key={role.$id} value={role.$id}>
-                  {role.rolename}
+                {filteredRoles.map(role => (
+                  <option key={role.$id} value={role.$id}>
+                    {role.rolename}
                 </option>
               ))}
             </select>

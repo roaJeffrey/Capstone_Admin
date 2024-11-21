@@ -17,6 +17,9 @@ function UserPage() {
   const accountRef = useRef(null);
   const sortRef = useRef(null);
 
+    // Admin role ID (the role we want to hide)
+  const adminRoleId = '673ee7be0020a2298fd1';
+
   // Function to refresh user list by fetching data again
   const refreshUserList = async () => {
     try {
@@ -65,7 +68,8 @@ function UserPage() {
           date: new Date(user.$createdAt).toLocaleDateString(),
           time: new Date(user.$createdAt).toLocaleTimeString(),
           status: user.status || 'offline',
-          $id: user.$id // Pass user ID to be used in dropdown or other logic
+          $id: user.$id, // Pass user ID to be used in dropdown or other logic
+          roleId: userRole?.role?.$id
         };
       });
 
@@ -104,10 +108,15 @@ function UserPage() {
     document.addEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleActionDropdown = (userId) => {
-    setIsActionOpen(isActionOpen === userId ? null : userId);
-    setIsSortOpen(false); // Close Sort button when Action button is opened
-  };
+const toggleActionDropdown = (userId) => {
+  // Close the dropdown if the same user is clicked
+  if (isActionOpen === userId) {
+    setIsActionOpen(null);
+  } else {
+    setIsActionOpen(userId);
+  }
+  setIsSortOpen(false);  // Close Sort dropdown when Action dropdown is toggled
+};
 
   const handleOpenModal = () => {
     setIsAddUserOpen(true); // Open the modal
@@ -134,6 +143,21 @@ function UserPage() {
       navigate('/');
     } catch (error) {
       console.error("Error during logout:", error);
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    console.log('Deleting user with ID:', userId);  // Ensure the correct ID is passed
+    try {
+      // Call the deleteDocument API to remove the user from the collection
+      await databases.deleteDocument('673b418100295c788a93', '673b41c1003840fb1cd8', userId);
+      console.log('User deleted from Appwrite');
+  
+      // Update the state to remove the deleted user
+      setUsers(prevUsers => prevUsers.filter(user => user.$id !== userId));
+      console.log('User removed from local state');
+    } catch (error) {
+      console.error('Error deleting user:', error);  // Log any errors during deletion
     }
   };
 
@@ -290,25 +314,32 @@ function UserPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user, index) => (
-                    <tr key={index} className="border-b">
+                  {users.filter(user => user.roleId !== adminRoleId).map(user => (
+                    <tr key={user.$id} className="border-b">
                       <td className="py-2">{user.name}</td>
                       <td>{user.userRole}</td>
                       <td>{user.date}</td>
                       <td>{user.date}</td>
                       <td className="px">
                         <button
-                          onClick={() => toggleActionDropdown(user.$id)} // Use user.$id directly
+                          onClick={() => toggleActionDropdown(user.$id)} // Open the action dropdown for the current user
                           className="inline-flex items-center justify-center text-blue-500 px-2 py-1 rounded-md text-sm"
                         >
                           <span className="text-gray-500">☰</span>
                         </button>
-                        {isActionOpen === user.$id && ( // Check if user.$id matches
+                        {isActionOpen === user.$id && ( // Show action dropdown only for the selected user
                           <div className="absolute right-20 bg-white shadow-md rounded-md mt-2 p-2 z-10">
-                            <button className="text-gray-800 text-left hover:bg-gray-100 px-4 py-2 rounded-md text-sm w-full">
+                            <button 
+                              className="text-gray-800 text-left hover:bg-gray-100 
+                              px-4 py-2 rounded-md text-sm w-full"
+                            >
                               Edit
                             </button>
-                            <button className="text-red-600 text-left hover:bg-red-100 px-4 py-2 rounded-md text-sm w-full">
+                            <button 
+                              onClick={() => deleteUser(user.$id)} // Delete the user when clicked
+                              className="text-red-600 text-left hover:bg-red-100 
+                              px-4 py-2 rounded-md text-sm w-full"
+                            >
                               Delete
                             </button>
                           </div>
