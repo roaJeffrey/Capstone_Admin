@@ -48,7 +48,7 @@ function SettingsPage() {
             <ul className="space-y-5">
             <li>
               <Link to="/home" className="block p-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
-              Overview
+                Dashboard
               </Link>
             </li>
             <li>
@@ -59,6 +59,11 @@ function SettingsPage() {
             <li>
               <Link to="/leaf" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
                 Leaf Disease
+              </Link>
+            </li>
+            <li>
+              <Link to="/feedback" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
+                Feedback
               </Link>
             </li>
             <li>

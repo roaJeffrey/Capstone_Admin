@@ -65,6 +65,11 @@ function NewPasswordPage() {
               </Link>
             </li>
             <li>
+              <Link to="/feedback" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white border-b-[1px] border-white">
+                Feedback
+              </Link>
+            </li>
+            <li>
               <Link to="/settings" className="block pl-2 pb-5 bg-custom-green transition duration-300 text-white">
                 Settings
               </Link>
