@@ -30,7 +30,7 @@ function LeafPage() {
         const imagesWithUserDetails = scanImagesData.map((image) => ({
           ...image,
           user: image.user || { firstname: "N/A", lastname: "" }, // Handle missing user data
-          imageUrl: image.image || "https://via.placeholder.com/150", // Handle missing image URL
+          imageUrl: image.image ? `data:image/jpeg;base64,${image.image}` : "https://via.placeholder.com/150", // Handle Base64 image data
         }));
 
         setScanImages(imagesWithUserDetails);
@@ -67,6 +67,7 @@ function LeafPage() {
     setIsAccountOpen(!isAccountOpen);
   };
 
+  // Logout Function
   const logoutUser = async () => {
     try {
       await account.deleteSession('current');
@@ -77,13 +78,14 @@ function LeafPage() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col lg:flex-row h-screen">
       {/* Sidebar */}
-        <aside className="w-60 bg-custom-green text-white flex flex-col justify-between">
-          <div>
+      <aside className="w-full lg:w-60 bg-custom-green text-white flex flex-col justify-between">
+        <div>
           <img 
             src="/logo/Coffeebyte_Logolandscape.png"
             className="w-[200px] h-auto flex ml-4 mr-4 mt-1"
+            alt="Logo"
           />
           <nav className="mt-5 ml-3">
             <ul className="space-y-5">
@@ -123,129 +125,103 @@ function LeafPage() {
                   Feedback
                 </Link>
               </li>
-              </ul>
-            </nav>
-          </div>
-          <button 
-            onClick={logoutUser} 
-            className="block m-5 mb-8 p-3 flex bg-custom-green transition duration-300 border border-white rounded text-white hover:bg-red-500"
-          >
-            <IoPower className="mr-4 mt-1"/>
-            Log Out
-          </button>
-        </aside>
-
+            </ul>
+          </nav>
+        </div>
+        <button 
+          onClick={logoutUser} 
+          className="block m-5 mb-8 p-3 flex bg-custom-green transition duration-300 border border-white rounded text-white hover:bg-red-500"
+        >
+          <IoPower className="mr-4 mt-1"/>
+          Log Out
+        </button>
+      </aside>
+  
       {/* Main Content */}
-      <main className="flex-1 pr-8 pl-8 pb-8 pt-5 bg-gray-100">
+      <main className="flex-1 pr-4 pl-4 pb-4 pt-4 lg:pr-8 lg:pl-8 lg:pb-8 lg:pt-5 bg-gray-100">
         {/* Header */}
-        <header className="relative flex w-full items-center justify-between pb-5 pl-5 pr-10">
+        <header className="relative flex flex-col lg:flex-row w-full items-start lg:items-center justify-between pb-5 pl-5 pr-10">
           <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-200 -ml-8 -mr-8"></span>
-            <div>
-              <h1 className="text-2xl font-bold">Leaf Diseases</h1>
-              <h3 className="text-gray-500">View the types of leaf diseases found in the farm.</h3>
-            </div>
-
-            {/* Account Button*/}
-            <div className="text-3xl" ref={accountRef}>
-              <button
-                onClick={toggleAccountDropdown}
-                className="block p-3 bg-white rounded-full shadow-md flex items-center 
-                justify-center transition duration-300 ease-in-out cursor-pointer hover:bg-gray-100"
-              >
-                <FaUser className="text-gray-600 size-5" />
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold">Leaf Diseases</h1>
+            <h3 className="text-gray-500 text-sm lg:text-base">
+              View the types of leaf diseases found in the farm.
+            </h3>
+          </div>
+  
+          {/* Account Button */}
+          <div className="mt-4 lg:mt-0 text-3xl" ref={accountRef}>
+            <button
+              onClick={toggleAccountDropdown}
+              className="block p-3 bg-white rounded-full shadow-md flex items-center justify-center transition duration-300 ease-in-out cursor-pointer hover:bg-gray-100"
+            >
+              <FaUser className="text-gray-600 size-5" />
+            </button>
+          </div>
+          {isAccountOpen && (
+            <div className="absolute bg-white right-10 top-16 shadow-md rounded-md p-2 w-80">
+              <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
+                Manage Account
+              </button>
+              <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
+                View Account
+              </button>
+              <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
+                Dark Mode
               </button>
             </div>
-              {isAccountOpen && (
-                <div className="absolute bg-white right-10 top-16 shadow-md rounded-md p-2 w-80">
-                  <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-                    Manage Account
-                  </button>
-                  <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-                    View Account
-                  </button>
-                  <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-                    Dark Mode
-                  </button>
-                </div>
-              )}
+          )}
         </header>
-
+  
         {/* Scan Images Table */}
-        <section className="bg-white rounded-lg shadow p-4 mt-10">
+        <section className="bg-white rounded-lg shadow p-4 mt-6">
           <div className="flex justify-between items-center border-b-[1px] border-black pb-2 mb-2">
-            <h3 className="text-lg font-bold">Scan Images</h3>
-            <div className="flex space-x-4 items-center">
-              {/* Search Input */}
-              <div className="flex items-center bg-white rounded-lg px-4 py-2 border">
-                <input
-                  type="text"
-                  placeholder="Search user..."
-                  className="outline-none bg-transparent text-gray-700 placeholder-gray-500 w-64"
-                />
-              </div>
-
-              {/* Sort Button */}
-              <div className="block" ref={sortRef}>
-                <button
-                  onClick={toggleSortDropdown}
-                  className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-300 transition duration-300 border"
-                >
-                  Sort
-                </button>
-
-                {isSortOpen && (
-                  <div className="absolute bg-white right-12 shadow-md rounded-md mt-2 p-2 z-10 w-40">
-                    <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-                      Sort by Name
-                    </button>
-                    <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-                      Sort by Time
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+            <h3 className="text-base lg:text-lg font-bold">Scan Images</h3>
           </div>
-
+  
           {/* Table */}
-          <table className="table-auto w-full">
-            <thead>
-              <tr className="text-gray-500 border-b border-gray-300 text-left">
-                <th className="pt-5 pb-5">Image</th>
-                <th>Disease Name</th>
-                <th>Severity</th>
-                <th>Label</th>
-                <th className="pl-5">User</th>
-                <th>Date Scanned</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scanImages.map((image) => (
-                <tr key={image.$id}>
-                  <td className="border-b border-gray-300">
-                    <img
-                      src={image.imageUrl}
-                      alt={image.diseasename || "No Image"}
-                      className="w-20 h-20 object-contain rounded"
-                    />
-                  </td>
-                  <td className="border-b border-gray-300">{image.diseasename || "N/A"}</td>
-                  <td className="border-b border-gray-300">{image.severity || "N/A"}</td>
-                  <td className="border-b border-gray-300">{image.label || "N/A"}</td>
-                  <td className="border-b border-gray-300 pl-5">
-                    {image.user.firstname} {image.user.lastname}
-                  </td>
-                  <td className="border-b border-gray-300">
-                    {new Date(image.$createdAt).toLocaleString()}
-                  </td>
+          <div className="table-container max-h-[450px] overflow-y-auto">
+            <table className="table-auto w-full">
+              <thead className="bg-gray-100 sticky top-0">
+                <tr className="text-gray-500 border-b border-gray-300 text-left">
+                  <th className="pt-3 pb-3 pl-4">Image</th>
+                  <th className="pl-4">Disease Name</th>
+                  <th className="pl-4">Severity</th>
+                  <th className="pl-4">Label</th>
+                  <th className="pl-4">User</th>
+                  <th className="pl-4">Date Scanned</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {scanImages.map((image) => (
+                  <tr key={image.$id} className="hover:bg-gray-50">
+                    <td className="border-b border-gray-300 pl-4">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.diseasename || "No Image"}
+                        className="w-16 lg:w-20 h-16 lg:h-20 object-contain rounded"
+                      />
+                    </td>
+                    <td className="border-b border-gray-300 pl-4">{image.diseasename || "N/A"}</td>
+                    <td className="border-b border-gray-300 pl-4">
+                      {image.severity ? parseFloat(image.severity).toFixed(2) : "N/A"}
+                    </td>
+                    <td className="border-b border-gray-300 pl-4">{image.label || "N/A"}</td>
+                    <td className="border-b border-gray-300 pl-4">
+                      {image.user.firstname} {image.user.lastname}
+                    </td>
+                    <td className="border-b border-gray-300 pl-4">
+                      {new Date(image.$createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
   );
-}
+}  
 
 export default LeafPage;

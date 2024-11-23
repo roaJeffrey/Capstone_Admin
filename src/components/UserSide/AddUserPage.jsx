@@ -28,7 +28,7 @@ function AddUserPage({ setIsAddUserOpen }) {
           "673b418100295c788a93", // Database ID
           "673b41d00018b34a286f"  // Role Collection ID
         );
-        console.log("Fetched roles:", roleResponse.documents); // For debugging
+        console.log("Fetched roles:", roleResponse.documents);
         setRoles(roleResponse.documents);
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -37,6 +37,7 @@ function AddUserPage({ setIsAddUserOpen }) {
     fetchRoles();
   }, []);
 
+  // Password Visibility
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const signupUser = async () => {
@@ -65,13 +66,12 @@ function AddUserPage({ setIsAddUserOpen }) {
       email: user.email,
       birthdate: birthDate,
       phonenumber: user.phoneNumber,
-      auth_user_id: newUser.$id
     };
 
     const userDocument = await databases.createDocument(
       "673b418100295c788a93", // Database ID
       "673b41c1003840fb1cd8", // User Collection ID
-      newUser.$id,            // Use the Auth user ID as the Document ID
+      newUser.$id,            // Use the Auth user ID as the Do cument ID
       userData                // Additional user data
     );
     console.log("User document created:", userDocument);
@@ -85,7 +85,7 @@ function AddUserPage({ setIsAddUserOpen }) {
         {
           role: selectedRole, // Role assigned to the user
           user: [newUser.$id], // Pass the userId from Auth
-          createdby: "673c684700246af87d9d", // Adjust as necessary (Admin User ID)
+          createdby: "674158f400086149a7e4", // Adjust as necessary (Admin User ID)
         }
       );
       console.log("User role assigned successfully.");
@@ -218,11 +218,12 @@ function AddUserPage({ setIsAddUserOpen }) {
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <option value="" disabled>Select Role</option>
-                {filteredRoles.map(role => (
+                {filteredRoles.map(role => {
+                  console.log("Rendering role:", role);
                   <option key={role.$id} value={role.$id}>
                     {role.rolename}
                 </option>
-              ))}
+                })}
             </select>
             {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
           </div>

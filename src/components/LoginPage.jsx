@@ -1,28 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { account } from '../appwrite/AppwriteConfig.js';
 
 
-function Login() {
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [user, setUser] = useState ({
     email: "",
     password: ""
   })
 
+  // Logging in the user if right credentials
   const loginUser = async (e) => {
     e.preventDefault();
-    try{
-      await account.createEmailPasswordSession(user.email, user.password)
-      navigate("/home")
-    }catch (error) {
-      console.error(error);
+    try {
+      await account.createEmailPasswordSession(user.email, user.password);
+      navigate("/home"); // Redirect to /home if login is successful
+    } catch (error) {
+      setError("Wrong credentials. Please check your email and password."); // Set error message if wrong credentials
     }
-    console.log("User Login".loginUser)
-  }
+  };
 
+  // This can't redirect the user to the home page when there is no active session
+  // This also redirect the user to the home page when the user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const session = await account.getSession("current");
+        if (session) {
+          navigate("/home");
+        }
+      } catch (error) {
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
+
+  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -43,7 +61,8 @@ function Login() {
               type="email"
               placeholder="Email"
               required
-              className="w-full px-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green"
+              className={`w-full px-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green ${error ? "border-red-500" : ""}`}
+              
               onChange={(e) =>
                 setUser({
                   ...user,
@@ -51,6 +70,7 @@ function Login() {
                 })
               }
             />
+             {error && <p className="text-red-500 text-sm">{error}</p>} {/* Display error message */}
           </div>
 
           <div className="relative">
@@ -58,7 +78,7 @@ function Login() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               required
-              className="w-full px-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green"
+              className={`w-full px-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green ${error ? "border-red-500" : ""}`}
               onChange={(e) =>
                 setUser({
                   ...user,
@@ -91,4 +111,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;

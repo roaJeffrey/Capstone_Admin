@@ -30,7 +30,7 @@ function FeedbackPage() {
       setIsAccountOpen(!isAccountOpen);
   };
 
-  
+  // Logout Function
   const logoutUser = async () => {
     try {
       // Delete the current session
@@ -43,63 +43,63 @@ function FeedbackPage() {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-        <aside className="w-60 bg-custom-green text-white flex flex-col justify-between">
-          <div>
-          <img 
-            src="/logo/Coffeebyte_Logolandscape.png"
-            className="w-[200px] h-auto flex ml-4 mr-4 mt-1"
-          />
-          <nav className="mt-5 ml-3">
-            <ul className="space-y-5">
-              <li>
-                <Link 
-                  to="/home" 
-                  className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
-                >
-                  <FaChartSimple className="mr-3 mt-1"/>
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/user" 
-                  className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
-                >
-                  <FaUserFriends className="mr-4 mt-1"/>
-                  User Management
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/leaf" 
-                  className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
-                >
-                  <FaLeaf className="mr-4 mt-1"/>
-                  Leaf Disease
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/feedback" 
-                  className="block p-4 bg-gray-100 flex rounded-l transition duration-300 text-custom-green"
-                >
-                  <MdFeedback className="mr-4 mt-1"/>
-                  Feedback
-                </Link>
-              </li>
-              </ul>
-            </nav>
-          </div>
-          <button 
-            onClick={logoutUser} 
-            className="block m-5 mb-8 p-3 flex bg-custom-green transition duration-300 border border-white rounded text-white hover:bg-red-500"
-          >
-            <IoPower className="mr-4 mt-1"/>
-            Log Out
-          </button>
-        </aside>
+<div className="flex flex-col lg:flex-row h-screen">
+    {/* Sidebar */}
+    <aside className="w-full lg:w-60 bg-custom-green text-white flex flex-col justify-between">
+      <div>
+        <img
+          src="/logo/Coffeebyte_Logolandscape.png"
+          className="w-[200px] h-auto flex ml-4 mr-4 mt-1"
+        />
+        <nav className="mt-5 ml-3">
+          <ul className="space-y-5">
+            <li>
+              <Link
+                to="/home"
+                className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
+              >
+                <FaChartSimple className="mr-3 mt-1" />
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/user"
+                className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
+              >
+                <FaUserFriends className="mr-4 mt-1" />
+                User Management
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/leaf"
+                className="block pl-4 pt-1 pb-1 flex bg-custom-green transition duration-300 text-white"
+              >
+                <FaLeaf className="mr-4 mt-1" />
+                Leaf Disease
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/feedback"
+                className="block p-4 bg-gray-100 flex rounded-l transition duration-300 text-custom-green"
+              >
+                <MdFeedback className="mr-4 mt-1" />
+                Feedback
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <button
+        onClick={logoutUser}
+        className="block m-5 mb-8 p-3 flex bg-custom-green transition duration-300 border border-white rounded text-white hover:bg-red-500"
+      >
+        <IoPower className="mr-4 mt-1" />
+        Log Out
+      </button>
+    </aside>
 
       {/* Main Content */}
       <main className="flex-1 pr-8 pl-8 pb-8 pt-5 bg-gray-100">
@@ -138,14 +138,14 @@ function FeedbackPage() {
         
         <section className="bg-white rounded-lg shadow p-4 mt-10">
           <div className="p-2">
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-x-auto">
                   {/* Example blank review sections */}
                   {[...Array(3)].map((_, index) => (
                   <section
                       key={index}
-                      className={'border rounded-lg p-4 shadow-md'}
+                      className={'border rounded-lg p-4 shadow-md w-full'}
                   >
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center mb-2 sticky top-0">
                       <div>
                           <h2 className="text-lg font-bold">Name Placeholder</h2>
                           <p className="text-sm text-gray-500">Date Placeholder</p>
