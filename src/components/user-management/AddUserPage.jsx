@@ -28,7 +28,6 @@ function AddUserPage({ setIsAddUserOpen }) {
           "673b418100295c788a93", // Database ID
           "673b41d00018b34a286f"  // Role Collection ID
         );
-        console.log("Fetched roles:", roleResponse.documents);
         setRoles(roleResponse.documents);
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -50,48 +49,48 @@ function AddUserPage({ setIsAddUserOpen }) {
     const birthDate = new Date(`${user.year}-${user.month}-${user.day}`).toISOString();
   
     try {
-    // After creating the user account via Appwrite Auth:
-    const newUser = await account.create(
-      uuidv4(),  // Unique user ID for Auth
-      user.email,
-      user.password,
-      name
-    );
-    console.log("User account created:", newUser.$id);
+      // Create the user account in Appwrite Auth
+      const newUser = await account.create(
+        uuidv4(),  // Unique user ID for Auth
+        user.email,
+        user.password,
+        name
+      );
+      console.log("User account created:", newUser.$id);
 
-    // Step 2: Save additional user info in the User collection
-    const userData = {
-      firstname: user.firstName,
-      lastname: user.lastName,
-      email: user.email,
-      birthdate: birthDate,
-      phonenumber: user.phoneNumber,
-    };
+      // Save additional user info in the User collection
+      const userData = {
+        firstname: user.firstName,
+        lastname: user.lastName,
+        email: user.email,
+        birthdate: birthDate,
+        phonenumber: user.phoneNumber,
+      };
 
-    const userDocument = await databases.createDocument(
-      "673b418100295c788a93", // Database ID
-      "673b41c1003840fb1cd8", // User Collection ID
-      newUser.$id,            // Use the Auth user ID as the Do cument ID
-      userData                // Additional user data
-    );
-    console.log("User document created:", userDocument);
-
-    // Step 3: Assign role to the user
-    if (selectedRole) {
       await databases.createDocument(
         "673b418100295c788a93", // Database ID
-        "673b41cc002db95aabfc", // User_Role Collection ID
-        uuidv4(),
-        {
-          role: selectedRole, // Role assigned to the user
-          user: [newUser.$id], // Pass the userId from Auth
-          createdby: "674158f400086149a7e4", // Adjust as necessary (Admin User ID)
-        }
+        "673b41c1003840fb1cd8", // User Collection ID
+        newUser.$id,
+        userData
       );
-      console.log("User role assigned successfully.");
-    }
-  
-      setIsAddUserOpen(false); // Close modal on success
+
+      // Assign role to the user
+      if (selectedRole) {
+        await databases.createDocument(
+          "673b418100295c788a93", // Database ID
+          "673b41cc002db95aabfc", // User_Role Collection ID
+          uuidv4(),
+          {
+            role: selectedRole, // Role assigned to the user
+            user: newUser.$id, // Pass the userId from Auth
+            createdby: "674158f400086149a7e4", // Admin User ID
+          }
+        );
+        console.log("User role assigned successfully.");
+      }
+
+      // Navigate to UserPage and close the modal
+      setIsAddUserOpen(false); 
     } catch (error) {
       console.error("Error during signup process:", error);
     }
@@ -101,8 +100,8 @@ function AddUserPage({ setIsAddUserOpen }) {
 
   const filteredRoles = roles.filter(role => role.$id !== '673ee7be0020a2298fd1');
 
-   // Phone number validation regex
-   const phoneRegex = /^(?:\+63|0)\s?9\d{2}\s?\d{3}\s?\d{4}$/;
+  // Phone number validation regex
+  const phoneRegex = /^(?:\+63|0)\s?9\d{2}\s?\d{3}\s?\d{4}$/;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -114,13 +113,13 @@ function AddUserPage({ setIsAddUserOpen }) {
             <input
               {...register("firstname", { required: "First name is required." })}
               placeholder="First Name"
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+              className='w-1/2 p-2 border rounded-md focus:outline-none'
               onChange={(e) => setUser({ ...user, firstName: e.target.value })}
             />
             <input
               {...register("lastname", { required: "Last name is required." })}
               placeholder="Last Name"
-              className="w-1/2 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+              className="w-1/2 p-2 border rounded-md focus:outline-none"
               onChange={(e) => setUser({ ...user, lastName: e.target.value })}
             />
           </div>
@@ -133,7 +132,7 @@ function AddUserPage({ setIsAddUserOpen }) {
             <div className="flex space-x-2">
               <select
                 {...register("month", { required: "Month is required." })}
-                className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                className="flex-1 p-2 border rounded-md focus:outline-none"
                 value={user.month}
                 onChange={(e) => setUser({ ...user, month: e.target.value })}
               >
@@ -144,7 +143,7 @@ function AddUserPage({ setIsAddUserOpen }) {
               </select>
               <select
                 {...register("day", { required: "Day is required." })}
-                className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                className="flex-1 p-2 border rounded-md focus:outline-none"
                 value={user.day}
                 onChange={(e) => setUser({ ...user, day: e.target.value })}
               >
@@ -155,7 +154,7 @@ function AddUserPage({ setIsAddUserOpen }) {
               </select>
               <select
                 {...register("year", { required: "Year is required." })}
-                className="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+                className="flex-1 p-2 border rounded-md focus:outline-none"
                 value={user.year}
                 onChange={(e) => setUser({ ...user, year: e.target.value })}
               >
@@ -167,7 +166,6 @@ function AddUserPage({ setIsAddUserOpen }) {
             </div>
           </div>
 
-
           {/* Phone Number */}
           <input
             {...register("phonenumber", { required: "Phone number is required.", 
@@ -178,7 +176,7 @@ function AddUserPage({ setIsAddUserOpen }) {
              })}
             placeholder="Phone Number"
             type="tel"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+            className="w-full p-2 border rounded-md focus:outline-none"
             onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
           />
 
@@ -187,7 +185,7 @@ function AddUserPage({ setIsAddUserOpen }) {
             {...register("email", { required: "Email is required." })}
             placeholder="Email"
             type="email"
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+            className="w-full p-2 border rounded-md focus:outline-none"
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
@@ -197,7 +195,7 @@ function AddUserPage({ setIsAddUserOpen }) {
               {...register("password", { required: "Password is required." })}
               placeholder="Password"
               type={showPassword ? "text" : "password"}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+              className="w-full p-2 border rounded-md focus:outline-none"
               onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
             <span 
@@ -213,17 +211,16 @@ function AddUserPage({ setIsAddUserOpen }) {
             <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
             <select
               {...register("role", { required: "Role is required." })}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-custom-green"
+              className="w-full p-2 border rounded-md focus:outline-none"
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <option value="" disabled>Select Role</option>
-                {filteredRoles.map(role => {
-                  console.log("Rendering role:", role);
-                  <option key={role.$id} value={role.$id}>
-                    {role.rolename}
+              {filteredRoles.map(role => (
+                <option key={role.$id} value={role.$id}>
+                  {role.rolename}
                 </option>
-                })}
+              ))}
             </select>
             {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
           </div>

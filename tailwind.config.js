@@ -7,6 +7,9 @@ module.exports = {
       colors: {
         'custom-green': '#3e735b',
         'custom-brown': '#997562',
+        'custom-yellow': '#e3b873',
+        'custom-red': '#9e3f28',
+        'custom-teal': '#4a9d8f',
         'dark-green': '#1b3b32', // Darker green for dark mode
         'dark-brown': '#5e3d2d', // Darker brown for dark mode
       },
