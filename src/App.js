@@ -13,6 +13,7 @@ import ProfilePage from './components/ProfilePage';
 import AddUserPage from './components/user-management/AddUserPage';
 import NewPasswordPage from './components/settings/NewPasswordPage';
 import FeedbackPage from './components/feedback/FeedbackPage';
+import UserViewPage from './components/user-management/UserViewPage';
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
                                 <Route path="/home" element={<HomePage />} />
                                 <Route path="/profile" element={<ProfilePage />} />
                                 <Route path="/user" element={<UserPage />} />
+                                <Route path="/user/view/:user_id" element={<UserViewPage />} />
                                 <Route path="/adduser" element={<AddUserPage />} />
                                 <Route path="/leaf" element={<LeafPage />} />
                                 <Route path="/settings" element={<SettingsPage />} />
