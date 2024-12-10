@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 // Create Context
-const PageContext = createContext();
+const Pagecontext = createContext();
 
 // Context Provider
 export const PageProvider = ({ children }) => {
@@ -9,11 +9,11 @@ export const PageProvider = ({ children }) => {
     const [pageDescription, setPageDescription] = useState('');
 
     return (
-        <PageContext.Provider value={{ pageTitle, setPageTitle, pageDescription, setPageDescription }}>
+        <Pagecontext.Provider value={{ pageTitle, setPageTitle, pageDescription, setPageDescription }}>
             {children}
-        </PageContext.Provider>
+        </Pagecontext.Provider>
     );
 };
 
 // Custom Hook
-export const usePageContext = () => useContext(PageContext);
+export const usePagecontext = () => useContext(Pagecontext);

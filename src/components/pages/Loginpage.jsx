@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext.js';
+import { useAuth } from '../../auth/AuthContext.js';
 
-function LoginPage() {
+function Loginpage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const { login, user } = useAuth();
@@ -102,5 +102,5 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default Loginpage;
 

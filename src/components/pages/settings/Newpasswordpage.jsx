@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { account, databases } from '../../appwrite/AppwriteConfig';
+import { account, databases } from '../../../appwrite/AppwriteConfig';
 
-function NewPasswordPage() {
+function Newpasswordpage() {
     const navigate = useNavigate();
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -171,4 +171,4 @@ function NewPasswordPage() {
   );
 };
 
-export default NewPasswordPage
+export default Newpasswordpage

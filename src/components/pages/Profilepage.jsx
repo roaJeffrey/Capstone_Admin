@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { account, databases } from '../appwrite/AppwriteConfig';
-import { usePageContext } from './layout/PageContext';
+import { account, databases } from '../../appwrite/AppwriteConfig';
+import { usePagecontext } from '../layout/Pagecontext';
 import { FaUser } from 'react-icons/fa';
 import { Query } from 'appwrite';
 
-function ProfilePage() {
-  const { setPageTitle, setPageDescription } = usePageContext();
+function Profilepage() {
+  const { setPageTitle, setPageDescription } = usePagecontext();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -84,7 +84,7 @@ function ProfilePage() {
 
   // Loading state
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   // No user found state
@@ -98,16 +98,16 @@ function ProfilePage() {
       {/* Main Content */}
       <main className="flex-1 pr-4 pl-4 lg:pr-8 lg:pl-8 pb-8 pt-5 bg-gray-100">
         {/* Profile Header */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-custom-green p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
             {/* Profile Picture */}
-            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-200 border">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-white border">
               <FaUser className="text-gray-600 text-3xl" />
             </div>
             {/* Profile Info */}
             <div>
-              <h2 className="text-xl font-semibold">{user.name}</h2>
-              <p className="text-gray-500">{user.role}</p> {/* Role displayed here */}
+              <h2 className="text-xl text-white font-semibold">{user.name}</h2>
+              <p className="text-gray-500 text-white">{user.role}</p> {/* Role displayed here */}
             </div>
           </div>
         </div>
@@ -146,4 +146,4 @@ function ProfilePage() {
   );
 }
 
-export default ProfilePage;
+export default Profilepage;

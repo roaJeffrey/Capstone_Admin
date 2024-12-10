@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { account, databases } from '../../appwrite/AppwriteConfig';
+import { account, databases } from '../../../appwrite/AppwriteConfig';
 
-function SettingsPage() {
+function Settingspage() {
   const navigate = useNavigate();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -110,4 +110,4 @@ function SettingsPage() {
   );
 };
 
-export default SettingsPage
+export default Settingspage

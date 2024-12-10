@@ -2,10 +2,10 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AccountDropdown from './AccountDropdown';
-import { usePageContext } from './PageContext';
+import { usePagecontext } from './Pagecontext';
 
 const SidebarLayout = () => {
-    const { pageTitle, pageDescription } = usePageContext();
+    const { pageTitle, pageDescription } = usePagecontext();
 
     return (
         <div className="flex h-screen">
