@@ -25,7 +25,9 @@ const Leafviewpage = () => {
           const leafWithImageUrl = {
             ...leafData,
             imageUrl: leafData.image
-              ? `data:image/jpeg;base64,${leafData.image}`
+              ? leafData.image.startsWith("data:")
+                ? leafData.image // Use as-is if already includes MIME type prefix
+                : `data:image/jpeg;base64,${leafData.image}` // Add prefix if missing
               : "https://via.placeholder.com/150", // Fallback image
           };
 

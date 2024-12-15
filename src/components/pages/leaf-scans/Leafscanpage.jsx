@@ -7,9 +7,9 @@ import Page from "../../common/Page";
 import Main from "../../common/Main";
 import Section from "../../common/Section";
 import Actiondropdown from "../../common/Actiondropdown";
-import { BsThreeDots } from "react-icons/bs";
 import { FaTrash } from "react-icons/fa";
 import { FaImage } from "react-icons/fa6";
+import Deletemodal from "../../common/Deletemodal";
 
 function Leafscanpage() {
   const [loading, setLoading] = useState(false);
@@ -44,9 +44,9 @@ function Leafscanpage() {
         const imagesWithUserDetails = scanImagesData.map((image) => ({
           ...image,
           user: image.user || { firstname: "N/A", lastname: "" }, // Handle missing user data
-          imageUrl: image.image
-            ? `data:image/jpeg;base64,${image.image}`
-            : "https://via.placeholder.com/150", // Handle Base64 image data
+          imageUrl: image.image.startsWith("data:")
+            ? image.image // Use as-is if already includes MIME type prefix
+            : `data:image/jpeg;base64,${image.image}`, // Add prefix if missing
         }));
 
         setScanImages(imagesWithUserDetails);
@@ -112,30 +112,33 @@ function Leafscanpage() {
                         />
                       </td>
                       <td>{image.diseasename || "N/A"}</td>
-                      <td>{image.label || "N/A"}</td><td>{image.user.firstname} {image.user.lastname}</td>
+                      <td>{image.label || "N/A"}</td>
+                      <td>
+                        {image.user.firstname} {image.user.lastname}
+                      </td>
                       <td>{new Date(image.$createdAt).toLocaleDateString()}</td>
                       <td className="item-center z-50">
-                      <Actiondropdown
-                        isOpen={isActionOpen}
-                        onToggle={toggleActionDropdown}
-                        id={image.$id}
-                        options={[
-                          {
-                            label: "View Image",
-                            icon: FaImage,
-                            onClick: () => navigate(`/leaf/view/${image.$id}`),
-                            textColor: "text-gray-800",
-                            hoverColor: "hover:bg-gray-200",
-                          },
-                          {
-                            label: "Delete",
-                            icon: FaTrash,
-                            onClick: () => handleDeleteClick(image.$id),
-                            textColor: "text-red-600",
-                            hoverColor: "hover:bg-red-200",
-                          },
-                        ]}
-                      />
+                        <Actiondropdown
+                          isOpen={isActionOpen}
+                          onToggle={toggleActionDropdown}
+                          id={image.$id}
+                          options={[
+                            {
+                              label: "View Image",
+                              icon: FaImage,
+                              onClick: () => navigate(`/leaf/view/${image.$id}`),
+                              textColor: "text-gray-800",
+                              hoverColor: "hover:bg-gray-200",
+                            },
+                            {
+                              label: "Delete",
+                              icon: FaTrash,
+                              onClick: () => handleDeleteClick(image.$id),
+                              textColor: "text-red-600",
+                              hoverColor: "hover:bg-red-200",
+                            },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -150,23 +153,12 @@ function Leafscanpage() {
 
       {/* Delete Modal */}
       {showDeleteModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Are you sure you want to delete this scan?</h3>
-            <button
-              onClick={() => deleteScan(scanIdToDelete)}
-              className="btn btn-danger"
-            >
-              Yes, Delete
-            </button>
-            <button
-              onClick={() => setShowDeleteModal(false)}
-              className="btn btn-secondary"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <Deletemodal
+          title="Delete scanned leaf data?"
+          itemToDelete={scanIdToDelete}
+          onConfirm={deleteScan}
+          onCancel={() => setShowDeleteModal(false)}
+        />
       )}
     </Page>
   );
