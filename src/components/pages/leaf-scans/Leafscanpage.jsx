@@ -112,7 +112,21 @@ function Leafscanpage() {
                         />
                       </td>
                       <td>{image.diseasename || "N/A"}</td>
-                      <td>{image.label || "N/A"}</td>
+                      <td
+                        className={
+                          image.label === "Severe"
+                            ? "text-red-500"
+                            : image.label === "Moderate"
+                            ? "text-orange-500"
+                            : image.label === "Mild"
+                            ? "text-yellow-500"
+                            : image.label === "Low"
+                            ? "text-green-500"
+                            : "text-gray-500"
+                        }
+                      >
+                        {image.label || "N/A"}
+                      </td>
                       <td>
                         {image.user.firstname} {image.user.lastname}
                       </td>

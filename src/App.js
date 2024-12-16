@@ -15,6 +15,7 @@ import Newpasswordpage from './components/pages/settings/Newpasswordpage';
 import Feedbackpage from './components/pages/feedback/Feedbackpage';
 import Viewuserpage from './components/pages/user-management/Viewuserpage';
 import Leafviewpage from './components/pages/leaf-scans/Leafviewpage';
+import Viewfeedbackpage from './components/pages/feedback/Viewfeedbackpage'
 
 function App() {
     return (
@@ -44,6 +45,7 @@ function App() {
                                 <Route path="/settings" element={<Settingspage />} />
                                 <Route path="/newpassword" element={<Newpasswordpage />} />
                                 <Route path="/feedback" element={<Feedbackpage />} />
+                                <Route path="/feedback/view/:feedback_id" element={<Viewfeedbackpage />} />
                             </Route>
                         </Routes>
                     </div>

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { databases } from "../../../appwrite/AppwriteConfig";
 import Loader from "../../common/Loader";
-import Deletemodal from "../../common/Deletemodal";  // Ensure correct import
+import Page from "../../common/Page";
+import Main from "../../common/Main";
+import Section from "../../common/Section";
+import Deletemodal from "../../common/Deletemodal";
 import Actiondropdown from "../../common/Actiondropdown";
 import { FaTrash } from "react-icons/fa";
 import { CgDetailsMore } from "react-icons/cg";
@@ -11,6 +15,7 @@ function Feedbackpage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [feedbackIdToDelete, setFeedbackIdToDelete] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -54,14 +59,14 @@ function Feedbackpage() {
     setIsDeleteModalOpen(false);
   };
 
-  return (
-    <div className="flex flex-col h-screen">
-      <main className="flex-1 pr-8 pl-8 pb-8 pt-5 bg-gray-100">
-        <section className="bg-white rounded-lg shadow p-4 mt-2">
-          <div className="flex justify-between items-center border-b-[1px] border-black pb-2 mb-2">
-            <h1 className="text-base lg:text-lg font-bold">Feedback</h1>
-          </div>
+  const viewFeedback = (feedback) => {
+    navigate(`/feedback/view/${feedback.$id}`, { state: { feedback } });
+  };
 
+  return (
+    <Page>
+      <Main>
+        <Section title="Feedback">
           {isLoading ? (
             <Loader />
           ) : (
@@ -97,7 +102,7 @@ function Feedbackpage() {
                             {
                               label: "View Feedback",
                               icon: CgDetailsMore,
-                              onClick: () => console.log("View feedback clicked"),
+                              onClick: () => viewFeedback(feedback),
                               textColor: "text-gray-800",
                               hoverColor: "hover:bg-gray-200",
                             },
@@ -117,8 +122,8 @@ function Feedbackpage() {
               </table>
             </div>
           )}
-        </section>
-      </main>
+        </Section>
+      </Main>
 
       {/* Delete Modal */}
       {isDeleteModalOpen && (
@@ -129,7 +134,7 @@ function Feedbackpage() {
           itemToDelete={feedbackIdToDelete} // Pass the feedback ID to be deleted
         />
       )}
-    </div>
+    </Page>
   );
 }
 
