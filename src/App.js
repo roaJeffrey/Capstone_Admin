@@ -8,10 +8,8 @@ import Loginpage from './components/pages/Loginpage';
 import Dashboardpage from './components/pages/dashboard/Dashboardpage';
 import Userpage from './components/pages/user-management/Userpage';
 import Leafscanpage from './components/pages/leaf-scans/Leafscanpage';
-import Settingspage from './components/pages/settings/Settingspage';
 import Profilepage from './components/pages/Profilepage';
 import Addusermodal from './components/pages/user-management/Addusermodal';
-import Newpasswordpage from './components/pages/settings/Newpasswordpage';
 import Feedbackpage from './components/pages/feedback/Feedbackpage';
 import Viewuserpage from './components/pages/user-management/Viewuserpage';
 import Leafviewpage from './components/pages/leaf-scans/Leafviewpage';
@@ -35,15 +33,13 @@ function App() {
                                     </ProtectedRoute>
                                 }
                             >
-                                <Route path="/home" element={<Dashboardpage />} />
+                                <Route path="/dashboard" element={<Dashboardpage />} />
                                 <Route path="/profile" element={<Profilepage />} />
                                 <Route path="/user" element={<Userpage />} />
                                 <Route path="/user/view/:user_id" element={<Viewuserpage />} />
                                 <Route path="/adduser" element={<Addusermodal />} />
                                 <Route path="/leaf" element={<Leafscanpage />} />
                                 <Route path="/leaf/view/:leaf_id" element={<Leafviewpage />} />
-                                <Route path="/settings" element={<Settingspage />} />
-                                <Route path="/newpassword" element={<Newpasswordpage />} />
                                 <Route path="/feedback" element={<Feedbackpage />} />
                                 <Route path="/feedback/view/:feedback_id" element={<Viewfeedbackpage />} />
                             </Route>

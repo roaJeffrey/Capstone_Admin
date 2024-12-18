@@ -46,7 +46,7 @@ const Actiondropdown = ({ options, onToggle, id }) => {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute top-full bg-white shadow-md rounded-md p-2 w-[11em] border border-gray-300 z-50"
+          className="absolute bg-white shadow-sm rounded-md p-2 w-[11em] border border-gray-300 z-20 top-full mt-2 right-5"
         >
           {options.map((option, index) => (
             <button

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Query } from "appwrite";
 import { databases } from "../../../appwrite/AppwriteConfig";
-import Editusermodal from "./Editusermodal";
+import Editusermodal from "../../common/Editusermodal";
 import { MdEdit } from "react-icons/md";
 
 const Viewuserpage = () => {
   const { user_id } = useParams();
   const [user, setUser] = useState(null);
-  const [isEditUserOpen, setIsEditUserOpen] = useState(false); // State for the Edit popup
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
 
   // Fetch user details
   useEffect(() => {
@@ -63,11 +63,19 @@ const Viewuserpage = () => {
       {/* Main Content */}
       <main className="flex-1 pr-4 pl-4 lg:pr-8 lg:pl-8 pb-8 pt-5 bg-gray-100">
         {/* User Header */}
-        <div className="bg-custom-green p-6 rounded-lg shadow-md">
+        <div className="bg-custom-green p-8 rounded-lg shadow-md">
           <div className="flex flex-col space-y-4">
-            <div>
-              <h2 className="text-xl text-white font-semibold">{`${user.firstname} ${user.lastname}`}</h2>
-              <p className="text-gray-200">User ID: {user.$id}</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl text-white font-semibold">{`${user.firstname} ${user.lastname}`}</h2>
+                <p className="text-gray-200">{user.email}</p>
+              </div>
+              <button
+                className="flex px-3 py-2 items-center justify-center text-custom-green bg-white font-medium rounded hover:bg-gray-100"
+                onClick={() => setIsEditUserOpen(true)}
+              >
+                <MdEdit className="mr-1" /> Edit
+              </button>
             </div>
           </div>
         </div>
@@ -76,44 +84,22 @@ const Viewuserpage = () => {
         <div className="bg-white mt-6 p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Personal Information</h3>
-            <button
-              className="flex p-2 items-center justify-center text-custom-brown font-medium rounded hover:bg-gray-200"
-              onClick={() => setIsEditUserOpen(true)}
-            >
-               <MdEdit className="mr-1" /> Edit
-            </button>
           </div>
+          
+          {/* Personal Information Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-gray-500">First Name:</p>
-              <p className="font-medium">{user.firstname}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Last Name:</p>
-              <p className="font-medium">{user.lastname}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Date of Birth:</p>
-              <p className="font-medium">
-                {user.birthdate
-                  ? new Date(user.birthdate).toLocaleDateString()
-                  : "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500">Email Address:</p>
-              <p className="font-medium">{user.email}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Phone Number:</p>
-              <p className="font-medium">{user.phonenumber}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Created At:</p>
-              <p className="font-medium">
-                {new Date(user.$createdAt).toLocaleString()}
-              </p>
-            </div>
+            {[
+              { label: 'First Name', value: user.firstname },
+              { label: 'Last Name', value: user.lastname },
+              { label: 'Date of Birth', value: user.birthdate ? new Date(user.birthdate).toLocaleDateString() : 'N/A' },
+              { label: 'Phone Number', value: user.phonenumber },
+              { label: 'Created At', value: new Date(user.$createdAt).toLocaleString() }
+            ].map((field, index) => (
+              <div key={index}>
+                <p>{field.label}:</p>
+                <p className="font-medium bg-gray-100 pl-4 p-2 m-1 rounded-lg">{field.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </main>

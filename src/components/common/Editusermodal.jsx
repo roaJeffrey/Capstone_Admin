@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { databases, account } from "../../../appwrite/AppwriteConfig";
-import BgLoading from "../../common/Bgloading";
+import { databases, account } from "../../appwrite/AppwriteConfig";
+import BgLoading from "./Bgloading";
 
 function Editusermodal({ user, setIsEditUserOpen, fetchUserData }) {
   const [loading, setLoading] = useState(false);

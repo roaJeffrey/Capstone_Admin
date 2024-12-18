@@ -14,14 +14,14 @@ function Loginpage() {
   // Redirect to /home if the user is already logged in
   useEffect(() => {
     if (user) {
-      navigate('/home');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
   const loginUser = async () => {
     try {
       await login(email, password);
-      navigate('/home');
+      navigate('/dashboard');
     } catch (error) {
       setError('Failed to log in. Please try again.');
       console.error(error);

@@ -33,7 +33,7 @@ const Sidebar = () => {
           <ul className="space-y-2">
             <li>
               <NavLink
-                to="/home"
+                to="/dashboard"
                 className={({ isActive }) =>
                   `block p-4 flex rounded-l transition duration-300 ${isActive ? 'bg-gray-100 text-custom-green' : 'bg-custom-green text-white'}`
                 }

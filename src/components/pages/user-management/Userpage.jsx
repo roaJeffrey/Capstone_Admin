@@ -12,6 +12,7 @@ import Main from "../../common/Main";
 import Page from "../../common/Page";
 import Actiondropdown from "../../common/Actiondropdown";
 import Deletemodal from "../../common/Deletemodal";
+import TableContent from "../../common/Tablecontent"; // Import TableContent component
 import {
   userResponse,
   userRoleResponse,
@@ -132,76 +133,59 @@ function Userpage() {
     return () => unsubscribe();
   }, []);
 
+  // Table Columns
+  const columns = ["Name", "Role", "Date Added", "Actions"];
+
+  // Render Table Row
+  const renderRow = (user) => (
+    <>
+      {/* Name */}
+      <td className="p-2">{user.name}</td>
+
+      {/* Role */}
+      <td className="px-10">{user.userRole}</td>
+
+      {/* Date Added */}
+      <td className="px-2">{user.date}</td>
+
+      {/* Actions */}
+      <td className="px-2">
+        <Actiondropdown
+          isOpen={isActionOpen === user.$id}
+          onToggle={() => toggleActionDropdown(user.$id)}
+          id={user.$id}
+          options={[
+            {
+              label: "View Details",
+              icon: CgDetailsMore,
+              onClick: () => navigate(`/user/view/${user.$id}`),
+              textColor: "text-gray-800",
+              hoverColor: "hover:bg-gray-200",
+            },
+            {
+              label: "Delete",
+              icon: FaTrash,
+              onClick: () => handleDeleteClick(user.$id),
+              textColor: "text-red-600",
+              hoverColor: "hover:bg-red-200",
+            },
+          ]}
+        />
+      </td>
+    </>
+  );
+
   return (
     <Page>
       <Main>
         {/* User Management Section */}
         <Section title="All Users" handleOpenModal={() => setIsAddUserOpen(!isAddUserOpen)}>
-          <div className="table-container max-h-[450px]">
-            {loading ? (
-              <div className="flex justify-center items-center h-full">
-                <AiOutlineLoading className="text-4xl text-custom-green mt-5 mb-5 animate-spin" />
-              </div>
-            ) : (
-              <table className="table-auto w-full">
-                <thead className="bg-gray-100 sticky top-0 z-10">
-                  <tr className="text-gray-500 border-b border-gray-300 text-left">
-                    <th className="p-3">Name</th>
-                    <th>Role</th>
-                    <th>Date Added</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users
-                    .filter((user) => user.roleId !== adminRoleId) // Filter out admins
-                    .map((user) => (
-                      <tr key={user.$id} className="border-b">
-                        <td className="border-b border-gray-300 p-3 align-text-middle">
-                          {user.name}
-                        </td>
-                        <td className="border-b border-gray-300">
-                          {user.userRole}
-                        </td>
-                        <td className="border-b border-gray-300">
-                          {new Date(user.date).toLocaleDateString()}
-                        </td>
-                        <td className="item-center">
-                          <Actiondropdown
-                            isOpen={isActionOpen === user.$id}
-                            onToggle={toggleActionDropdown}
-                            id={user.$id}
-                            options={[
-                              // {
-                              //   label: "Edit",
-                              //   icon: MdEdit,
-                              //   onClick: () => {}, // Implement edit functionality here
-                              //   textColor: "text-gray-800",
-                              //   hoverColor: "hover:bg-gray-200",
-                              // },
-                              {
-                                label: "View Details",
-                                icon: CgDetailsMore,
-                                onClick: () => navigate(`/user/view/${user.$id}`),
-                                textColor: "text-gray-800",
-                                hoverColor: "hover:bg-gray-200",
-                              },
-                              {
-                                label: "Delete",
-                                icon: FaTrash,
-                                onClick: () => handleDeleteClick(user.$id),
-                                textColor: "text-red-600",
-                                hoverColor: "hover:bg-red-200",
-                              },
-                            ]}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          <TableContent
+            data={users.filter((user) => user.roleId !== adminRoleId)} // Filter out admins
+            columns={columns}
+            isLoading={loading}  // Pass loading status to TableContent
+            renderRow={renderRow}
+          />
         </Section>
 
         {/* Deletion Confirmation Modal */}

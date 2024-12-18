@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { account, databases } from '../../appwrite/AppwriteConfig';
 import { usePagecontext } from '../layout/Pagecontext';
-import { FaUser } from 'react-icons/fa';
+import Editusermodal from "../common/Editusermodal";
 import { Query } from 'appwrite';
+import { MdEdit } from "react-icons/md";
 
 function Profilepage() {
   const { setPageTitle, setPageDescription } = usePagecontext();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
 
   // Header setup
   useEffect(() => {
@@ -60,6 +62,7 @@ function Profilepage() {
               email: userDoc.email || 'N/A',
               birthdate: userDoc.birthdate || 'N/A',
               role: roleName, // Directly set to 'Admin'
+              createdAt: userDoc.$createdAt, // Add createdAt field
             };
 
             setUser(userData);
@@ -77,6 +80,50 @@ function Profilepage() {
     }
   };
 
+  // Reload user data after editing
+  const fetchUserData = async () => {
+    try {
+      const currentUser = await account.get();
+      const loggedInUserId = currentUser.$id;
+
+      const userDocResponse = await databases.listDocuments(
+        '673b418100295c788a93',
+        '673b41c1003840fb1cd8',
+        [Query.equal('$id', [loggedInUserId])]
+      );
+
+      if (userDocResponse.documents.length > 0) {
+        const userDoc = userDocResponse.documents[0];
+
+        const userRoleResponse = await databases.listDocuments(
+          '673b418100295c788a93',
+          '673b41cc002db95aabfc',
+          [Query.equal('user', [loggedInUserId])]
+        );
+
+        if (userRoleResponse.documents.length > 0) {
+          const userRoleDoc = userRoleResponse.documents[0];
+
+          const roleName = 'Admin';
+
+          const userData = {
+            id: currentUser.$id,
+            name: `${userDoc.firstname || 'N/A'} ${userDoc.lastname || 'N/A'}`,
+            phone: userDoc.phonenumber || 'N/A',
+            email: userDoc.email || 'N/A',
+            birthdate: userDoc.birthdate || 'N/A',
+            role: roleName,
+            createdAt: userDoc.$createdAt,
+          };
+
+          setUser(userData);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   // Fetch data on component mount
   useEffect(() => {
     fetchUserDetails();
@@ -84,7 +131,13 @@ function Profilepage() {
 
   // Loading state
   if (loading) {
-    return <div></div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <p className="text-lg text-gray-500 animate-pulse">
+          Loading admin details...
+        </p>
+      </div>
+    );
   }
 
   // No user found state
@@ -98,16 +151,19 @@ function Profilepage() {
       {/* Main Content */}
       <main className="flex-1 pr-4 pl-4 lg:pr-8 lg:pl-8 pb-8 pt-5 bg-gray-100">
         {/* Profile Header */}
-        <div className="bg-custom-green p-6 rounded-lg shadow-md">
-          <div className="flex items-center space-x-4">
-            {/* Profile Picture */}
-            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-white border">
-              <FaUser className="text-gray-600 text-3xl" />
-            </div>
-            {/* Profile Info */}
-            <div>
-              <h2 className="text-xl text-white font-semibold">{user.name}</h2>
-              <p className="text-gray-500 text-white">{user.role}</p> {/* Role displayed here */}
+        <div className="bg-custom-green p-8 rounded-lg shadow-md">
+          <div className="flex flex-col space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl text-white font-semibold">{user.name}</h2>
+                <p className="text-gray-200">{user.email}</p>
+              </div>
+              <button
+                className="flex px-3 py-2 items-center justify-center text-custom-green bg-white font-medium rounded hover:bg-gray-100"
+                onClick={() => setIsEditUserOpen(true)}
+              >
+                <MdEdit className="mr-1" /> Edit
+              </button>
             </div>
           </div>
         </div>
@@ -116,32 +172,34 @@ function Profilepage() {
         <div className="bg-white mt-6 p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Personal Information</h3>
-            <button className="text-orange-500 font-medium">Edit</button>
           </div>
+          
+          {/* Personal Information Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-gray-500">First Name</p>
-              <p className="font-medium">{user.name.split(' ')[0]}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Last Name</p>
-              <p className="font-medium">{user.name.split(' ')[1]}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Date of Birth</p>
-              <p className="font-medium">{new Date(user.birthdate).toLocaleDateString()}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Email Address</p>
-              <p className="font-medium">{user.email}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Phone Number</p>
-              <p className="font-medium">{user.phone}</p>
-            </div>
+            {[
+              { label: 'First Name', value: user.name.split(' ')[0] },
+              { label: 'Last Name', value: user.name.split(' ')[1] },
+              { label: 'Date of Birth', value: user.birthdate ? new Date(user.birthdate).toLocaleDateString() : 'N/A' },
+              { label: 'Phone Number', value: user.phone },
+              { label: 'Role', value: user.role },
+              { label: 'Created At', value: new Date(user.createdAt).toLocaleString() }
+            ].map((field, index) => (
+              <div key={index}>
+                <p>{field.label}:</p>
+                <p className="font-medium bg-gray-100 pl-4 p-2 m-1 rounded-lg">{field.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </main>
+      {/* Edit User Popup */}
+      {isEditUserOpen && (
+        <Editusermodal
+          user={user}
+          setIsEditUserOpen={setIsEditUserOpen}
+          fetchUserData={fetchUserData} // Reload user data after editing
+        />
+      )}
     </div>
   );
 }

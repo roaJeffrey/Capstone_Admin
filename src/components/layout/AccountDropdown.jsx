@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { FaUser } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const AccountDropdown = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const accountRef = useRef(null);
+  const location = useLocation(); // Get the current location
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -29,6 +30,13 @@ const AccountDropdown = () => {
     };
   }, [isDropdownOpen]);
 
+  // Close the dropdown when navigating to the profile page
+  React.useEffect(() => {
+    if (location.pathname === '/profile') {
+      setIsDropdownOpen(false);
+    }
+  }, [location.pathname]);
+
   return (
     <div className="relative" ref={accountRef}>
       <button
@@ -42,15 +50,13 @@ const AccountDropdown = () => {
         <div className="absolute bg-white right-10 top-16 shadow-md rounded-md p-2 w-80 border border-gray-300 z-20">
           <NavLink
             to="/profile"
+            onClick={() => setIsDropdownOpen(false)} // Close dropdown when clicked
             className={({ isActive }) =>
               `block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full ${isActive ? 'bg-gray-100 text-custom-green' : ''}`
             }
           >
             View Account
           </NavLink>
-          <button className="block text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm w-full">
-            Dark Mode
-          </button>
         </div>
       )}
     </div>

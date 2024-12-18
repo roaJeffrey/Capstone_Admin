@@ -1,11 +1,11 @@
 import React from "react";
 import { AiOutlineLoading } from "react-icons/ai";
 
-const Loader = () => {
+const Loader = ({ color = "text-custom-green" }) => {
   return (
     // Loading indicator
     <div className="flex justify-center items-center h-32">
-      <AiOutlineLoading className="text-4xl text-custom-green animate-spin" />
+      <AiOutlineLoading className={`text-4xl ${color} animate-spin`} />
     </div>
   );
 };

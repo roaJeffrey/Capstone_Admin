@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { databases } from "../../../appwrite/AppwriteConfig";
+import { usePagecontext } from "../../layout/Pagecontext";
 import Loader from "../../common/Loader";
 import Page from "../../common/Page";
 import Main from "../../common/Main";
@@ -9,13 +10,21 @@ import Deletemodal from "../../common/Deletemodal";
 import Actiondropdown from "../../common/Actiondropdown";
 import { FaTrash } from "react-icons/fa";
 import { CgDetailsMore } from "react-icons/cg";
+import Tablecontent from "../../common/Tablecontent"; // Import TableContent
 
 function Feedbackpage() {
   const [feedbackList, setFeedbackList] = useState([]);
+  const { setPageTitle, setPageDescription } = usePagecontext();
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [feedbackIdToDelete, setFeedbackIdToDelete] = useState(null);
   const navigate = useNavigate();
+
+  // Header Setup
+  useEffect(() => {
+    setPageTitle("Feedback");
+    setPageDescription("View employee's feedback submissions.");
+  }, [setPageTitle, setPageDescription]);
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -63,65 +72,56 @@ function Feedbackpage() {
     navigate(`/feedback/view/${feedback.$id}`, { state: { feedback } });
   };
 
+  const columns = ["Name", "Feedback", "Actions"]; // Exclude Time column
+
+  // Render row function for TableContent
+  const renderRow = (feedback) => (
+    <tr key={feedback.$id}>
+      <td className="border-b border-gray-300 p-3">
+        {feedback.user
+          ? `${feedback.user.firstname} ${feedback.user.lastname}`
+          : "Anonymous"}
+      </td>
+      <td className="border-b border-gray-300">
+        {feedback.feedbacktext.length > 50
+          ? `${feedback.feedbacktext.substring(0, 50)}...`
+          : feedback.feedbacktext}
+      </td>
+      <td className="border-b border-gray-300 pl-3">
+        <Actiondropdown
+          options={[
+            {
+              label: "View Feedback",
+              icon: CgDetailsMore,
+              onClick: () => viewFeedback(feedback),
+              textColor: "text-gray-800",
+              hoverColor: "hover:bg-gray-200",
+            },
+            {
+              label: "Delete",
+              icon: FaTrash,
+              onClick: () => openDeleteModal(feedback.$id),
+              textColor: "text-red-600",
+              hoverColor: "hover:bg-red-200",
+            },
+          ]}
+        />
+      </td>
+    </tr>
+  );
+
   return (
     <Page>
       <Main>
         <Section title="Feedback">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <div className="table-container max-h-[450px]">
-              <table className="table-auto w-full">
-                <thead className="bg-gray-100 sticky top-0">
-                  <tr className="text-gray-500 border-b border-gray-300 text-left">
-                    <th className="p-3">Name</th>
-                    <th className="pl-5">Feedback</th>
-                    <th className="pl-4">Time</th>
-                    <th className="pl-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {feedbackList.map((feedback) => (
-                    <tr key={feedback.$id}>
-                      <td className="border-b border-gray-300 p-3">
-                        {feedback.user
-                          ? `${feedback.user.firstname} ${feedback.user.lastname}`
-                          : "Anonymous"}
-                      </td>
-                      <td className="border-b border-gray-300 pl-5">
-                        {feedback.feedbacktext.length > 50
-                          ? `${feedback.feedbacktext.substring(0, 50)}...`
-                          : feedback.feedbacktext}
-                      </td>
-                      <td className="border-b border-gray-300 pl-4">
-                        {new Date(feedback.$createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="border-b border-gray-300 pl-4">
-                        <Actiondropdown
-                          options={[
-                            {
-                              label: "View Feedback",
-                              icon: CgDetailsMore,
-                              onClick: () => viewFeedback(feedback),
-                              textColor: "text-gray-800",
-                              hoverColor: "hover:bg-gray-200",
-                            },
-                            {
-                              label: "Delete",
-                              icon: FaTrash,
-                              onClick: () => openDeleteModal(feedback.$id),
-                              textColor: "text-red-600",
-                              hoverColor: "hover:bg-red-200",
-                            },
-                          ]}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="table-container max-h-[450px]">
+            <Tablecontent
+              data={feedbackList}
+              columns={columns}
+              isLoading={isLoading}
+              renderRow={renderRow}
+            />
+          </div>
         </Section>
       </Main>
 
