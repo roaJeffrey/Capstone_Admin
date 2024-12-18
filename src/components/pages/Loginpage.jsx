@@ -41,7 +41,7 @@ function Loginpage() {
   return (
     <div className="flex justify-center items-center h-screen font-sans bg-gray-50">
       <div className="flex flex-col items-center w-1/2 p-8 border-r border-gray-200">
-        <img src="/logo/Coffeebyte_logoportrait.png" className="mx-auto" style={{ width: '20rem' }} />
+        <img src="/logo/Coffeebyte_Logoportrait.png" className="mx-auto" style={{ width: '20rem' }} />
       </div>
 
       <div className="flex flex-col text-left items-center w-1/2 p-8">
