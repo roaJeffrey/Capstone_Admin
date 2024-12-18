@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { client, databases } from "../../../appwrite/AppwriteConfig"; // Import client directly
+import { client, functions } from "../../../appwrite/AppwriteConfig"; // Import client directly
 import { Query } from "appwrite";
 import Addusermodal from "./Addusermodal";
 import { usePagecontext } from "../../layout/Pagecontext";
@@ -90,29 +90,16 @@ function Userpage() {
 
   const deleteUser = async (userId) => {
     try {
-      // Delete from the User collection
-      await databases.deleteDocument("673b418100295c788a93", "673b41c1003840fb1cd8", userId);
+      const body = JSON.stringify({ id:userId, route:"delete" })
 
-      // Query and delete the related User_Role entries
-      const userRoleDocs = await databases.listDocuments(
-        "673b418100295c788a93",
-        "673b41cc002db95aabfc",
-        [Query.equal("user", userId)]
-      );
-
-      const deletePromises = userRoleDocs.documents.map((doc) =>
-        databases.deleteDocument("673b418100295c788a93", "673b41cc002db95aabfc", doc.$id)
-      );
-      await Promise.all(deletePromises); // Wait for all deletions
-
-      // Remove the user from the local state
+      await functions.createExecution("6762b098002ed7a9288d", body)
       setUsers((prevUsers) => prevUsers.filter((user) => user.$id !== userId));
-    } catch (error) {
+    } catch(error) {
       console.error("Error deleting user:", error);
     } finally {
-      setShowDeleteModal(false); // Close the delete modal
+      setShowDeleteModal(false);
     }
-  };
+    };
 
   const handleDeleteClick = (userId) => {
     setUserIdToDelete(userId);

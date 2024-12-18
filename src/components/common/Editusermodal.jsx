@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { databases, account } from "../../appwrite/AppwriteConfig";
+import { functions } from "../../appwrite/AppwriteConfig";
 import BgLoading from "./Bgloading";
 
 function Editusermodal({ user, setIsEditUserOpen, fetchUserData }) {
@@ -25,33 +25,19 @@ function Editusermodal({ user, setIsEditUserOpen, fetchUserData }) {
     setLoading(true);
 
     try {
-      // Update user's email in Appwrite's Auth system
-      if (editedUser.email !== user.email) {
-        await account.updateEmail(editedUser.email, ""); // Empty string for no password validation
-        console.log("Email updated successfully.");
-      }
+      const body = JSON.stringify({
+        id: user.$id,
+        firstname: editedUser.firstname,
+        lastname: editedUser.lastname,
+        email: editedUser.email,
+        phone: editedUser.phonenumber,
+        password: editedUser.password,
+        route: "update"
+      })
 
-      // If password is updated, update it in Appwrite's Auth system
-      if (editedUser.password) {
-        await account.updatePassword(editedUser.password); // Update password without requiring current password
-        console.log("Password updated successfully.");
-      }
+      await functions.createExecution("6762b098002ed7a9288d", body)
 
-      // Update user's details in the User collection
-      await databases.updateDocument(
-        "673b418100295c788a93", // Database ID
-        "673b41c1003840fb1cd8", // User Collection ID
-        user.$id,
-        {
-          firstname: editedUser.firstname,
-          lastname: editedUser.lastname,
-          phonenumber: editedUser.phonenumber,
-          email: editedUser.email,
-        }
-      );
-
-      console.log("User details updated successfully.");
-      fetchUserData(); // Refresh user data in parent component
+      fetchUserData();
       setIsEditUserOpen(false);
     } catch (error) {
       console.error("Error updating user:", error);
