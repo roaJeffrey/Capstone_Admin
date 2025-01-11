@@ -40,59 +40,74 @@ function Loginpage() {
 
   return (
     <div className="flex justify-center items-center h-screen font-sans bg-gray-50">
-      <div className="flex flex-col items-center w-1/2 p-8 border-r border-gray-200">
-        <img src="/logo/Coffeebyte_Logoportrait.png" className="mx-auto" style={{ width: '20rem' }} />
+      <div className="absolute inset-0 bg-cover bg-center h-screen">
+        <img src="/logo/Coffeebyte_bg.jpg" className="w-full h-full object-cover"/>
       </div>
 
-      <div className="flex flex-col text-left items-center w-1/2 p-8">
-        <h2 className="text-3xl font-semibold text-custom-green mb-2">Welcome!</h2>
-        <p className="text-black mb-6">Scan smarter, farm better</p>
+      <div className="flex flex-col px-10 pb-8 shadow-lg border rounded-2xl border-white items-center w-1/8 z-10">
+        <img src="/logo/Coffeebyte_Logolandscape.png" className="w-[15em]"/>
+        <h2 className="text-2xl font-semibold text-white mb-2">Sign In</h2>
 
-        <form className="w-full max-w-sm space-y-4" onSubmit={handleSubmit}>
-          <div className="relative">
+        <form className="w-[300px] max-w-sm" onSubmit={handleSubmit}>
+          <div className="relative w-full">
             <input
               type="email"
-              placeholder="Email"
+              id="email"
+              placeholder=" "
               required
-              className={`w-full px-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green ${error ? "border-red-500" : ""}`}
+              className={`peer w-full px-4 pt-5 pb-2 text-white bg-custom-green border-b focus:outline-none focus:none ${ error ? "border-red-500" : "border-white-300" }`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (error) setError('');
               }}
             />
+            <label
+              htmlFor="email"
+              className="absolute text-white text-sm transition-all duration-200 left-4 top-0 peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-white-300 peer-focus:top-0 peer-focus:text-sm peer-focus:text-white-300"
+            >
+              Email
+            </label>
           </div>
 
-          <div className="relative">
+          <div className="relative w-full mt-3">
             <input
               type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
+              id="password"
+              placeholder=" "
               required
-              className={`w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-custom-green ${error ? "border-red-500" : ""}`}
+              className={`peer w-full px-4 pt-5 pb-2 text-white bg-custom-green border-b focus:outline-none focus:none ${ error ? "border-red-500" : "border-white-300" }`}
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (error) setError('');
               }}
             />
-            <span 
-              onClick={togglePasswordVisibility} 
-              className="absolute right-3 top-5 transform -translate-y-1/2 cursor-pointer text-gray-500"
+            <label
+              htmlFor="password"
+              className="absolute text-white text-sm transition-all duration-200 left-4 top-0 peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-white-300 peer-focus:top-0 peer-focus:text-sm peer-focus:text-white-300"
+            >
+              Password
+            </label>
+            <span
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-8 transform -translate-y-1/2 cursor-pointer text-white"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
 
+
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button 
             type="submit" 
-            className="w-full mt-30 bg-custom-green text-white py-2 rounded hover:bg-green-800 transition-colors duration-200"
+            className="w-full mt-20 bg-custom-brown text-white py-2 rounded hover:bg-amber-900 transition-colors duration-200"
           >
             Login
           </button>
 
-          <a href="#" className="flex justify-center text-sm text-custom-green hover:underline text-right block">
+          <a href="#" className="flex justify-center mt-5 text-sm text-white hover:underline text-right block">
             Forgot Password?
           </a>
 
